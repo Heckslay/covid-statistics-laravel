@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\StatisticSyncJob;
 use App\Models\Country;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,23 @@ class SyncService
         }
 
         DB::commit();
+        return true;
+    }
+
+    /**
+     * @return bool
+     * @author Lasha Lomidze <lomidzelashaf@gmail.com>
+     */
+    public static function syncStatistics(): bool
+    {
+        $countries = Country::with('todayStatistic')->get();
+        foreach ($countries as $country) {
+            try {
+                dispatch(new StatisticSyncJob($country));
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
         return true;
     }
 }
