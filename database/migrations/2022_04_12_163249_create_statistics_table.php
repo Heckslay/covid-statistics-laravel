@@ -15,14 +15,13 @@ return new class extends Migration
     {
         Schema::create('statistics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('country_id')->index();
+            $table->foreignId('country_id')->constrained()->cascadeOnDelete();
             $table->integer('confirmed');
             $table->integer('recovered');
-            $table->integer('death');
-            /* Foreign Keys */
-            $table->foreign('country_id')
-                ->references('id')
-                ->on('countries');
+            $table->integer('deaths');
+            $table->integer('critical');
+            $table->dateTime('synced_at');
+            $table->timestamps();
         });
     }
 
