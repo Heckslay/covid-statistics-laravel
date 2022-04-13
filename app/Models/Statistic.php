@@ -13,9 +13,33 @@ class Statistic extends Model
     use HasFactory;
 
     /**
+     * @return mixed
+     * @author Lasha Lomidze <lomidzelashaf@gmail.com>
+     * Selects total sums of confirmed, death and recovered
+     * cases of COVID pandemic. Makes sure that all values are numeric.
+     */
+    public static function getTotalSummary(): mixed
+    {
+        $summaryItems = self::first(
+            DB::Raw('sum(confirmed) as total_confirmed,
+                           sum(deaths) as total_deaths,
+                           sum(recovered) as total_recovered'))
+            ->toArray();
+        foreach ($summaryItems as &$summaryItem) {
+            $summaryItem = $summaryItem === null ? 0 : $summaryItem;
+        }
+
+        return $summaryItems;
+    }
+
+    /**
      * @param $country
      * @return bool
      * @author Lasha Lomidze <lomidzelashaf@gmail.com>
+     * A function to fetch and save COVID statistics for a
+     * provided country code. Makes sure to have one country
+     * statistic record per day. Also handles update of existing
+     * record if ran multiple times during the day.
      */
     public static function fetchStatistic($country): bool
     {
@@ -38,6 +62,8 @@ class Statistic extends Model
      * @param $data
      * @return void
      * @author Lasha Lomidze <lomidzelashaf@gmail.com>
+     * A dynamic field setting function to avoid manual
+     * setting of the model's fields. Goal - Reduce code amount.
      */
     public function setFields($data)
     {
