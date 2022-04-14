@@ -1,64 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# COVID-19 Statistics Laravel API 🚀
+## Introduction
+This Laravel app handles fetching/synchronizing of the COVID-19 statistics
+on hourly basis. Also, provides sanctum auth protected endpoints for fetching total summary 
+and per-country summary of the following statistical information:
+1. Confirmed Disease Cases
+2. Recovered Cases
+3. Death Cases
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The task was done based on requirements available on this 
+[link](https://gist.github.com/giunashvili/279f4ae108501b30caae4c7486c8ba64).
 
-## About Laravel
+## Installation
+This is a regular Laravel project. The basic requirements and guide for Laravel project installation 
+can be found [here](https://laravel.com/docs/9.x).
+Since, it was required app to be run via Octane, you would want to select RoadRunner binary to run
+locally. You'll be asked to select the preferred binary during composer install.
+You should create .env file and update it with values for the following entries:
+> OCTANE_SERVER=roadrunner
+> COVID_API_BASE_URL="https://devtest.ge/"
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Also populate .env with correct database connection details.<br>
+Run migrations after:
+> php artisan migrate
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+To fetch the countries run:
+> php artisan command:sync-countries
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+For local test run, to fetch statistics without waiting for scheduler go to console/Kernel.php
+and change:
+> $schedule->command('command:sync-statistics')->hourly();
 
-## Learning Laravel
+to
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+> $schedule->command('command:sync-statistics')->everyTwoMinutes();
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Then open up two terminal windows and run in the first one:
+> php artisan schedule:work
 
-## Laravel Sponsors
+and 
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+> php artisan queue:listen
 
-### Premium Partners
+Since this is just a test project, you'll need to populate the users table with a seeder.
+Simply run:
+> php artisan db:seed
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+To create 10 users in the database. Use your DBMS to fetch the users, take email and default password
+which is directly "password" string to do an auth.
 
-## Contributing
+To execute the available feature tests run:
+> php artisan test
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+in the second one. You'll be able to see the sync queue execution progress in the second terminal.
+Once it's done, you can close these terminals and run:
+> php artisan octane:start
 
-## Code of Conduct
+To start the web server.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## API Documentation
+It didn't feel right to put the API docs in Readme file. You can find the Postman collection
+with included API 
+documentation [here](https://drive.google.com/file/d/1j9byz71nzRdrFFcKZYS5mFHh-nQ6McPA/view?usp=sharing).
 
-## Security Vulnerabilities
+## Project Improvement Ideas
+1. Integrate Redis caching to reduce calls to database
+2. Implement sign up
+3. More to come...
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
